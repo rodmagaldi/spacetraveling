@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { GetStaticProps } from 'next';
 import Head from 'next/head';
 import Image from 'next/image';
+import Link from 'next/link';
 
 import { format } from 'date-fns';
 import ptBR from 'date-fns/locale/pt-BR';
@@ -17,6 +18,7 @@ import logoImg from '../../public/images/logo.svg';
 
 import commonStyles from '../styles/common.module.scss';
 import styles from './home.module.scss';
+import Header from '../components/Header';
 
 interface Post {
   uid?: string;
@@ -94,6 +96,7 @@ export default function Home({ postsPagination }: HomeProps): JSX.Element {
       <Head>
         <title>home | spacetraveling</title>
       </Head>
+
       <main className={styles.contentContainer}>
         <div className={styles.logo}>
           <Image src={logoImg} height={25} width={240} alt="logo" />
@@ -101,22 +104,28 @@ export default function Home({ postsPagination }: HomeProps): JSX.Element {
 
         <section className={styles.content}>
           {posts?.results?.map(post => (
-            <article key={post.uid}>
-              <h1>{post.data.title}</h1>
-              <p>{post.data.subtitle}</p>
-              <div className={styles.postInfo}>
-                <div className={styles.postInfoSection}>
-                  <FiCalendar />
-                  <time className={styles.iconText}>
-                    {post.first_publication_date}
-                  </time>
-                </div>
-                <div className={styles.postInfoSection}>
-                  <FiUser />
-                  <span className={styles.iconText}>{post.data.author}</span>
-                </div>
-              </div>
-            </article>
+            <Link href={`/post/${post.uid}`} key={post.uid}>
+              <a>
+                <article>
+                  <h1>{post.data.title}</h1>
+                  <p>{post.data.subtitle}</p>
+                  <div className={styles.postInfo}>
+                    <div className={styles.postInfoSection}>
+                      <FiCalendar />
+                      <time className={styles.iconText}>
+                        {post.first_publication_date}
+                      </time>
+                    </div>
+                    <div className={styles.postInfoSection}>
+                      <FiUser />
+                      <span className={styles.iconText}>
+                        {post.data.author}
+                      </span>
+                    </div>
+                  </div>
+                </article>
+              </a>
+            </Link>
           ))}
 
           {posts.next_page && (
