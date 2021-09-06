@@ -2,7 +2,6 @@ import { useState } from 'react';
 
 import { GetStaticProps } from 'next';
 import Head from 'next/head';
-import Image from 'next/image';
 import Link from 'next/link';
 
 import { format } from 'date-fns';
@@ -14,11 +13,8 @@ import { FiUser } from 'react-icons/fi';
 import Prismic from '@prismicio/client';
 import { getPrismicClient } from '../services/prismic';
 
-import logoImg from '../../public/images/logo.svg';
-
 import commonStyles from '../styles/common.module.scss';
 import styles from './home.module.scss';
-import Header from '../components/Header';
 
 interface Post {
   uid?: string;
@@ -55,36 +51,13 @@ const fetchPosts = async (page = 1) => {
   return response;
 };
 
-const mapPostsPagination = (response: any): PostPagination => {
-  const postsPagination: PostPagination = {
-    next_page: response.next_page,
-    results: response.results.map(post => ({
-      uid: post.uid,
-      first_publication_date: format(
-        new Date(post.first_publication_date),
-        'dd LLL yyyy',
-        {
-          locale: ptBR,
-        }
-      ),
-      data: {
-        author: post.data.author,
-        subtitle: post.data.subtitle,
-        title: post.data.title,
-      },
-    })),
-  };
-
-  return postsPagination;
-};
-
 export default function Home({ postsPagination }: HomeProps): JSX.Element {
-  const [page, setPage] = useState(1);
   const [posts, setPosts] = useState(postsPagination);
 
   const handleLoadMore = async (): Promise<void> => {
-    setPage(page + 1);
-    const newPosts = mapPostsPagination(await fetchPosts(page + 1));
+    const response = await fetch(posts.next_page);
+    const newPosts = await response.json();
+
     setPosts({
       next_page: newPosts.next_page,
       results: [...posts.results, ...newPosts.results],
@@ -98,10 +71,13 @@ export default function Home({ postsPagination }: HomeProps): JSX.Element {
       </Head>
 
       <main className={styles.contentContainer}>
-        <div className={styles.logo}>
-          <Image src={logoImg} height={25} width={240} alt="logo" />
-        </div>
-
+        <img
+          className={styles.logo}
+          src="/images/logo.svg"
+          height={25}
+          width={240}
+          alt="logo"
+        />
         <section className={styles.content}>
           {posts?.results?.map(post => (
             <Link href={`/post/${post.uid}`} key={post.uid}>
@@ -113,7 +89,13 @@ export default function Home({ postsPagination }: HomeProps): JSX.Element {
                     <div className={styles.postInfoSection}>
                       <FiCalendar />
                       <time className={styles.iconText}>
-                        {post.first_publication_date}
+                        {format(
+                          new Date(post.first_publication_date),
+                          'dd LLL yyyy',
+                          {
+                            locale: ptBR,
+                          }
+                        )}
                       </time>
                     </div>
                     <div className={styles.postInfoSection}>
@@ -148,9 +130,7 @@ export default function Home({ postsPagination }: HomeProps): JSX.Element {
 export const getStaticProps: GetStaticProps = async () => {
   const response = await fetchPosts();
 
-  const postsPagination = mapPostsPagination(response);
-
   return {
-    props: { postsPagination },
+    props: { postsPagination: response },
   };
 };
