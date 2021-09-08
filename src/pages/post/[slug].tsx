@@ -7,6 +7,7 @@ import ptBR from 'date-fns/locale/pt-BR';
 
 import { GetStaticPaths, GetStaticProps } from 'next';
 import Head from 'next/head';
+import Link from 'next/link';
 
 import { FiCalendar, FiUser, FiClock } from 'react-icons/fi';
 
@@ -16,6 +17,7 @@ import { getPrismicClient } from '../../services/prismic';
 
 import Header from '../../components/Header';
 import CommentSection from '../../components/CommentSection';
+import ExitPreviewButton from '../../components/ExitPreviewButton';
 
 import commonStyles from '../../styles/common.module.scss';
 import styles from './post.module.scss';
@@ -39,9 +41,10 @@ interface Post {
 
 interface PostProps {
   post: Post;
+  preview: boolean;
 }
 
-export default function Post({ post }: PostProps): JSX.Element {
+export default function Post({ post, preview }: PostProps): JSX.Element {
   const router = useRouter();
 
   if (router.isFallback) {
@@ -115,9 +118,9 @@ export default function Post({ post }: PostProps): JSX.Element {
               );
             })}
           </article>
+          <CommentSection />
+          {preview && <ExitPreviewButton />}
         </section>
-
-        <CommentSection />
       </main>
     </>
   );
@@ -139,15 +142,22 @@ export const getStaticPaths: GetStaticPaths = async () => {
   return { paths, fallback: true };
 };
 
-export const getStaticProps: GetStaticProps = async ({ params }) => {
+export const getStaticProps: GetStaticProps = async ({
+  params,
+  preview = false,
+  previewData = {},
+}) => {
   const { slug } = params;
+  const { ref } = previewData;
 
   const prismic = getPrismicClient();
-  const response = await prismic.getByUID('post', String(slug), {});
+  const response =
+    (await prismic.getByUID('post', String(slug), ref ? { ref } : null)) || {};
 
   return {
     props: {
       post: response,
+      preview,
     },
     revalidate: 1,
   };

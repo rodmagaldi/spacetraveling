@@ -13,6 +13,8 @@ import { FiUser } from 'react-icons/fi';
 import Prismic from '@prismicio/client';
 import { getPrismicClient } from '../services/prismic';
 
+import ExitPreviewButton from '../components/ExitPreviewButton';
+
 import commonStyles from '../styles/common.module.scss';
 import styles from './home.module.scss';
 
@@ -33,10 +35,11 @@ interface PostPagination {
 
 interface HomeProps {
   postsPagination: PostPagination;
+  preview: boolean;
 }
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-const fetchPosts = async (page = 1) => {
+const fetchPosts = async (page: number, previewData) => {
   const prismic = getPrismicClient();
 
   const response = await prismic.query(
@@ -45,13 +48,17 @@ const fetchPosts = async (page = 1) => {
       fetch: ['post.title', 'post.subtitle', 'post.author'],
       pageSize: 1,
       page,
+      ref: previewData?.ref ?? null,
     }
   );
 
   return response;
 };
 
-export default function Home({ postsPagination }: HomeProps): JSX.Element {
+export default function Home({
+  postsPagination,
+  preview,
+}: HomeProps): JSX.Element {
   const [posts, setPosts] = useState(postsPagination);
 
   const handleLoadMore = async (): Promise<void> => {
@@ -122,15 +129,19 @@ export default function Home({ postsPagination }: HomeProps): JSX.Element {
             </span>
           )}
         </section>
+        {preview && <ExitPreviewButton />}
       </main>
     </>
   );
 }
 
-export const getStaticProps: GetStaticProps = async () => {
-  const response = await fetchPosts();
+export const getStaticProps: GetStaticProps = async ({
+  preview = false,
+  previewData,
+}) => {
+  const response = await fetchPosts(1, previewData);
 
   return {
-    props: { postsPagination: response },
+    props: { postsPagination: response, preview },
   };
 };
