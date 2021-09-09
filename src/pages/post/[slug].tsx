@@ -7,7 +7,6 @@ import ptBR from 'date-fns/locale/pt-BR';
 
 import { GetStaticPaths, GetStaticProps } from 'next';
 import Head from 'next/head';
-import Link from 'next/link';
 
 import { FiCalendar, FiUser, FiClock } from 'react-icons/fi';
 
@@ -24,6 +23,7 @@ import styles from './post.module.scss';
 
 interface Post {
   first_publication_date: string | null;
+  last_publication_date: string | null;
   data: {
     title: string;
     banner: {
@@ -106,6 +106,17 @@ export default function Post({ post, preview }: PostProps): JSX.Element {
               <span className={styles.iconText}>{time} min</span>
             </div>
           </div>
+          {post?.first_publication_date !== post?.last_publication_date && (
+            <p className={styles.editedAt}>
+              {format(
+                new Date(post?.last_publication_date),
+                "'* editado em 'dd LLL yyyy 'às' HH:mm",
+                {
+                  locale: ptBR,
+                }
+              )}
+            </p>
+          )}
           <article>
             {post?.data?.content?.map(section => {
               return (

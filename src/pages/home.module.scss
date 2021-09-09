@@ -35,6 +35,10 @@
     article {
       margin-bottom: 3rem;
 
+      p {
+        color: var(--light-grey-body);
+      }
+
       transition: all 0.2s;
 
       &:hover h1 {
@@ -45,6 +49,7 @@
 
     .postInfo {
       display: flex;
+      color: var(--gray-info);
 
       .postInfoSection {
         &:first-child {

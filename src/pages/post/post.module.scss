@@ -2,6 +2,8 @@
   display: flex;
 
   .postInfoSection {
+    color: var(--gray-info);
+
     &:first-child,
     &:nth-child(2) {
       margin-right: 1.25rem;
@@ -32,6 +34,15 @@
     margin-bottom: 1.5rem;
   }
 
+  .editedAt {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+
+    color: var(--gray-info);
+
+    font-size: 0.875rem;
+  }
+
   article {
     line-height: 1.4rem;
     margin-top: 4rem;
@@ -40,6 +51,7 @@
       font-weight: 2.25rem;
       font-weight: 700;
       margin-bottom: 2.25rem;
+      color: var(--white-heading);
 
       &:not(:first-child) {
         margin-top: 3rem;
@@ -48,6 +60,7 @@
 
     p {
       font-size: 1.125rem;
+      color: var(--light-grey-body);
 
       &:last-child {
         margin-bottom: 3rem;
